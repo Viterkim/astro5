@@ -14,7 +14,9 @@ return {
         "codelldb",
 
         -- typescript / javascript
+        "vtsls",
         "js-debug-adapter",
+        "eslint_d",
       },
     },
   },

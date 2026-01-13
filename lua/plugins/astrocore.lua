@@ -35,6 +35,29 @@ return {
         [".*/etc/foo/.*"] = "fooscript",
       },
     },
+
+    -- Don't go back
+    rooter = {
+      enabled = false,
+    },
+
+    -- On startup, cd to the file's folder
+    autocmds = {
+      set_dir_on_startup = {
+        {
+          event = "VimEnter",
+          desc = "Change directory to the file/folder argument",
+          callback = function()
+            if vim.fn.argc() > 0 then
+              local arg = vim.fn.argv(0) --[[@as string]]
+              local dir = vim.fn.isdirectory(arg) == 1 and arg or vim.fn.fnamemodify(arg, ":h")
+              vim.cmd("cd " .. dir)
+            end
+          end,
+        },
+      },
+    },
+
     -- vim options can be configured here
     options = {
       opt = { -- vim.opt.<key>

@@ -3,10 +3,17 @@ return {
   opts = {
     picker = {
       layout = {
-        preset = "vertical",
+        width = 0.95,
+        height = 0.95,
         layout = {
-          width = 0.95,
-          height = 0.95,
+          box = "vertical",
+          border = "rounded",
+          title = "{source}",
+          title_pos = "center",
+
+          { win = "preview", title = "{preview}", height = 0.4, border = "bottom" },
+          { win = "input", height = 1, border = "bottom", title = "{title} {live} {flags}" },
+          { win = "list", border = "none" },
         },
       },
       win = {
