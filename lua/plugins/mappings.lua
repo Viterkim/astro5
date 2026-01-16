@@ -5,7 +5,6 @@ return {
     opts = {
       mappings = {
         n = {
-          -- === YOUR CUSTOM NAVIGATION & EDITS ===
           ["j"] = { "<C-o>", desc = "Jump Back" },
           ["J"] = { "<C-i>", desc = "Jump Forward" },
           ["l"] = { "o<esc>", desc = "New Line Below" },
@@ -41,13 +40,16 @@ return {
           -- Plugins: Spectre
           ["<leader>,a"] = { '<cmd>lua require("spectre").open()<CR>', desc = "Spectre" },
           ["<leader>,w"] = { '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', desc = "Spectre Word" },
-          ["<leader>,p"] = { '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>', desc = "Spectre File" },
+          ["<leader>,p"] = {
+            '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>',
+            desc = "Spectre File",
+          },
 
           -- Plugins: Utilities
           ["<leader>iy"] = { "<cmd>let @+=expand('%:~:.')<cr>", desc = "Copy relative path" },
           ["<leader>ix"] = { "<cmd>e ++ff=unix<cr>", desc = "Fix windows endlines" },
           ["<leader>q"] = { "<cmd>q<CR>", desc = "Quit window" },
-          
+
           -- Plugins: Testing
           ["<leader>ti"] = { function() require("neotest").output.open { enter = true } end, desc = "Neotest Output" },
 
@@ -58,7 +60,43 @@ return {
 
           -- Toggles
           ["<C-y>"] = { function() require("lsp_lines").toggle() end, desc = "Toggle lsp_lines" },
+
+          -- i stuff
+          ["<leader>if"] = { function() vim.lsp.buf.code_action() end, desc = "LSP Fixes" },
+          ["<leader>id"] = { function() vim.diagnostic.open_float() end, desc = "Float diagnostics" },
+          ["<leader>it"] = {
+            function()
+              vim.lsp.buf.hover()
+              vim.lsp.buf.hover()
+            end,
+            desc = "Hover enter",
+          },
+          ["ø"] = { function() vim.lsp.buf.hover() end, desc = "Hover symbol" },
+
+          -- Rust / Crate specific
+          ["<leader>ib"] = { "<cmd>RustLsp debug<cr>", desc = "Debug Function" },
+          ["<leader>is"] = {
+            "<cmd>AerialPrev<cr><cmd>RustLsp hover actions<cr><cmd>RustLsp hover actions<cr>",
+            desc = "Hover Actions",
+          },
+          ["<leader>io"] = { function() require("crates").show_features_popup() end, desc = "Crate Features" },
+
+          -- Aerial specific
+          ["<leader>ip"] = { "<cmd>AerialPrev<cr><cmd>RustLsp debug<cr>", desc = "Debug Prev Func" },
+          ["<leader>iu"] = { "<cmd>AerialNavOpen<cr>", desc = "Aerial Nav" },
+
+          -- Diagnostics Copy Hack
+          ["<leader>ic"] = {
+            function()
+              vim.diagnostic.open_float()
+              vim.diagnostic.open_float()
+              vim.cmd "normal! ggVGy"
+              vim.cmd "close"
+            end,
+            desc = "Copy diagnostics",
+          },
         },
+        -- Insert Mode
         i = {
           ["<C-y>"] = { function() require("lsp_lines").toggle() end, desc = "Toggle lsp_lines" },
           ["<C-b>"] = { "<esc>$a;<esc>:w<cr>", desc = "Insert ; and save" },
@@ -70,6 +108,7 @@ return {
           ["__"] = { "<esc>:w<cr>", desc = "Save & Normal" },
           ["_("] = { "_", desc = "Literal Underscore" },
         },
+        -- Visual Mode
         v = {
           ["r"] = { "<C-u>" },
           ["s"] = { "<C-d>" },
@@ -83,46 +122,6 @@ return {
           ["<Bs>"] = { "x", desc = "Delete" },
           ["o"] = { "ygvd", desc = "Cut" },
           ["c"] = { "ygv", desc = "Copy selection" },
-        },
-      },
-    },
-  },
-  {
-    "AstroNvim/astrolsp",
-    ---@type AstroLSPOpts
-    opts = {
-      mappings = {
-        n = {
-          ["<leader>if"] = { function() vim.lsp.buf.code_action() end, desc = "LSP Fixes" },
-          ["<leader>id"] = { function() vim.diagnostic.open_float() end, desc = "Float diagnostics" },
-          ["<leader>it"] = { 
-             function() 
-               vim.lsp.buf.hover() 
-               vim.lsp.buf.hover() 
-             end, 
-             desc = "Hover enter" 
-          },
-          ["ø"] = { function() vim.lsp.buf.hover() end, desc = "Hover symbol" },
-
-          -- Rust / Crate specific
-          ["<leader>ib"] = { "<cmd>RustLsp debug<cr>", desc = "Debug Function" },
-          ["<leader>is"] = { "<cmd>AerialPrev<cr><cmd>RustLsp hover actions<cr><cmd>RustLsp hover actions<cr>", desc = "Hover Actions" },
-          ["<leader>io"] = { function() require("crates").show_features_popup() end, desc = "Crate Features" },
-          
-          -- Aerial specific
-          ["<leader>ip"] = { "<cmd>AerialPrev<cr><cmd>RustLsp debug<cr>", desc = "Debug Prev Func" },
-          ["<leader>iu"] = { "<cmd>AerialNavOpen<cr>", desc = "Aerial Nav" },
-          
-          -- Diagnostics Copy Hack
-          ["<leader>ic"] = {
-            function()
-              vim.diagnostic.open_float()
-              vim.diagnostic.open_float()
-              vim.cmd "normal! ggVGy"
-              vim.cmd "close"
-            end,
-            desc = "Copy diagnostics",
-          },
         },
       },
     },
