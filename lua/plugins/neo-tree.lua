@@ -11,7 +11,7 @@ return {
         leave_dirs_open = false,
       },
       filtered_items = {
-        visible = false, -- Must be false for specific hide rules to work
+        visible = false,
         hide_dotfiles = false,
         hide_gitignored = false,
         hide_by_name = {
@@ -26,7 +26,7 @@ return {
       {
         event = "file_added",
         handler = function(file_path)
-          vim.schedule(function() vim.cmd("edit " .. file_path) end)
+          vim.defer_fn(function() vim.cmd("edit " .. vim.fn.fnameescape(file_path)) end, 50)
         end,
       },
     },
