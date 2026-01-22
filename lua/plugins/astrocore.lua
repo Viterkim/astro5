@@ -36,6 +36,7 @@ return {
       },
       g = {
         autoformat = true,
+        diagnostics_mode = 2,
       },
     },
   },

@@ -5,9 +5,6 @@ return {
   opts = {
     mappings = {
       n = {
-        -- === Navigation ===
-        -- We use feedkeys directly. It is instant.
-        -- It bypasses the "E523" crash and removes the "funky" delay of vim.schedule.
         ["j"] = {
           function()
             local key = vim.api.nvim_replace_termcodes("<C-o>", true, false, true)
@@ -25,8 +22,6 @@ return {
         ["l"] = { "o<esc>", desc = "New Line Below" },
         ["r"] = { "<C-u>", desc = "Page Up" },
         ["s"] = { "<C-d>", desc = "Page Down" },
-
-        -- === Buffers ===
         ["S"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
         ["R"] = { function() require("astrocore.buffer").nav(-vim.v.count1) end, desc = "Prev buffer" },
         ["]b"] = { function() require("astrocore.buffer").nav(vim.v.count1) end, desc = "Next buffer" },
@@ -39,15 +34,11 @@ return {
           end,
           desc = "Close buffer from tabline",
         },
-
-        -- === LSP / Code ===
         ["gd"] = { function() vim.lsp.buf.definition() end, desc = "LSP Definition" },
         ["gy"] = { function() vim.lsp.buf.type_definition() end, desc = "LSP Type Definition" },
-        ["grr"] = { function() require("telescope.builtin").lsp_references() end, desc = "Show References" },
+        ["grr"] = { function() require("snacks").picker.lsp_references() end, desc = "Show References" },
         ["gI"] = { function() vim.lsp.buf.implementation() end, desc = "LSP Implementation" },
         ["ø"] = { function() vim.lsp.buf.hover() end, desc = "Hover symbol details" },
-
-        -- Dressing.nvim handles the UI for these now (No crashes!)
         ["<leader>if"] = { function() vim.lsp.buf.code_action() end, desc = "LSP Fixes" },
         ["<leader>id"] = { function() vim.diagnostic.open_float() end, desc = "Float diagnostics" },
         ["<leader>ic"] = {
@@ -59,12 +50,12 @@ return {
           end,
           desc = "Copy diagnostics",
         },
-        ["<leader>ii"] = { function() require("telescope.builtin").diagnostics() end, desc = "All diagnostics" },
-        ["<leader>ir"] = { function() require("telescope.builtin").lsp_references() end, desc = "Show References" },
+        ["<leader>ii"] = { function() require("snacks").picker.diagnostics() end, desc = "All diagnostics" },
+        ["<leader>ir"] = { function() require("snacks").picker.lsp_references() end, desc = "Show References" },
+        ["<leader>ff"] = { function() require("snacks").picker.files() end, desc = "Find Files" },
+        ["<leader>fw"] = { function() require("snacks").picker.grep() end, desc = "Find Words" },
         ["<leader>iy"] = { "<cmd>let @+=expand('%:~:.')<cr>", desc = "Copy relative path" },
         ["<leader>ix"] = { "<cmd>e ++ff=unix<cr>", desc = "Fix windows endlines" },
-
-        -- === Rust & Plugins ===
         ["<leader>ib"] = { "<cmd>RustLsp debug<cr>", desc = "Debug Function" },
         ["<leader>ip"] = { "<cmd>AerialPrev<cr><cmd>RustLsp debug<cr>", desc = "Debug Prev Func" },
         ["<leader>io"] = { function() require("crates").show_features_popup() end, desc = "Crate Features" },
@@ -88,8 +79,6 @@ return {
           '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>',
           desc = "Spectre File",
         },
-
-        -- === Edits / Visual ===
         ["__"] = { ":w<cr>", desc = "Save File" },
         ["<Backspace>"] = { "x", desc = "Delete char" },
         ["de"] = { "<S-v>ygvd", desc = "Cut Line" },
@@ -97,21 +86,29 @@ return {
         ["<S-Down>"] = { "<cmd>m+<cr>", desc = "Move line down" },
         ["<S-l>"] = { "<cmd>:call vm#commands#add_cursor_up(0, 1)<cr>", desc = "Multicursor up" },
         ["<S-u>"] = { "<cmd>:call vm#commands#add_cursor_down(0, 1)<cr>", desc = "Multicursor down" },
-
-        -- === Splits ===
         ["H"] = { function() require("smart-splits").move_cursor_left() end, desc = "Move left" },
         ["h"] = { function() require("smart-splits").move_cursor_right() end, desc = "Move right" },
         ["k"] = { function() require("smart-splits").move_cursor_down() end, desc = "Move down" },
         ["K"] = { function() require("smart-splits").move_cursor_up() end, desc = "Move up" },
-
-        -- === CTRL ===
         ["<C-s>"] = { ":w!<cr>", desc = "Save File" },
-        ["<C-y>"] = { function() require("lsp_lines").toggle() end, desc = "Toggle lsp_lines" },
+        ["<C-y>"] = {
+          function()
+            local new_val = not vim.diagnostic.config().virtual_lines
+            vim.diagnostic.config { virtual_lines = new_val }
+          end,
+          desc = "Toggle lsp_lines",
+        },
         ["<C-b>"] = { "<esc>$a;<esc>", desc = "Insert ; at end" },
         ["<C-t>"] = { "<esc>", desc = "Escape" },
       },
       i = {
-        ["<C-y>"] = { function() require("lsp_lines").toggle() end, desc = "Toggle lsp_lines" },
+        ["<C-y>"] = {
+          function()
+            local new_val = not vim.diagnostic.config().virtual_lines
+            vim.diagnostic.config { virtual_lines = new_val }
+          end,
+          desc = "Toggle lsp_lines",
+        },
         ["<C-b>"] = { "<esc>$a;<esc>:w<cr>", desc = "Insert ; and save" },
         ["<C-s>"] = { "<esc>:w<cr>a", desc = "Save File" },
         ["<C-t>"] = { "<esc>", desc = "Normal Mode" },
@@ -127,7 +124,13 @@ return {
         ["j"] = { "<esc>", desc = "Normal Mode" },
         ["<S-Up>"] = { "<cmd>m-2<cr>", desc = "Move line up" },
         ["<S-Down>"] = { "<cmd>m+<cr>", desc = "Move line down" },
-        ["<C-y>"] = { function() require("lsp_lines").toggle() end, desc = "Toggle lsp_lines" },
+        ["<C-y>"] = {
+          function()
+            local new_val = not vim.diagnostic.config().virtual_lines
+            vim.diagnostic.config { virtual_lines = new_val }
+          end,
+          desc = "Toggle lsp_lines",
+        },
         ["<C-t>"] = { "<esc>", desc = "Normal Mode" },
         ["<C-b>"] = { "<esc>$a;<esc>", desc = "Insert ;" },
         ["__"] = { "<esc>:w<cr>", desc = "Save & Normal" },

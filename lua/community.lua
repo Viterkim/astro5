@@ -11,7 +11,6 @@ return {
   { import = "astrocommunity.colorscheme.tokyonight-nvim" },
   { import = "astrocommunity.scrolling.nvim-scrollbar" },
   { import = "astrocommunity.lsp.lsp-signature-nvim" },
-  { import = "astrocommunity.diagnostics.lsp_lines-nvim" },
 
   -- === Editing Support ===
   { import = "astrocommunity.editing-support.vim-visual-multi" },

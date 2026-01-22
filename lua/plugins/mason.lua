@@ -10,7 +10,6 @@ return {
 
         -- rust
         "rust-analyzer",
-        "rustfmt",
         "codelldb",
 
         -- typescript / javascript
