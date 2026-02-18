@@ -21,16 +21,6 @@ return {
       hijack_netrw_behavior = "open_current",
       use_libuv_file_watcher = true,
     },
-
-    event_handlers = {
-      {
-        event = "file_added",
-        handler = function(file_path)
-          vim.defer_fn(function() vim.cmd("edit " .. vim.fn.fnameescape(file_path)) end, 50)
-        end,
-      },
-    },
-
     window = {
       width = 25,
       mappings = {
