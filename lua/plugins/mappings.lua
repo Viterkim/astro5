@@ -1,7 +1,7 @@
 ---@type LazySpec
 return {
   "AstroNvim/astrocore",
-  ---@type AstroCoreOpts
+  -- ---@type AstroCoreOpts
   opts = {
     mappings = {
       n = {
