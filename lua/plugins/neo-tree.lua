@@ -20,6 +20,7 @@ return {
       },
       hijack_netrw_behavior = "open_current",
       use_libuv_file_watcher = true,
+      use_popups_for_input = true,
     },
     window = {
       width = 25,
