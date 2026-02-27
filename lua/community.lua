@@ -20,10 +20,12 @@ return {
   { import = "astrocommunity.search.nvim-spectre" },
   { import = "astrocommunity.test.neotest" },
 
+  -- === Markdown And Latex ===
+  { import = "astrocommunity.markdown-and-latex.render-markdown-nvim" },
+
   -- === Language Packs ===
   { import = "astrocommunity.pack.json" },
   { import = "astrocommunity.pack.rust" },
   { import = "astrocommunity.pack.go" },
   { import = "astrocommunity.pack.yaml" },
-  { import = "astrocommunity.pack.python-ruff" },
 }

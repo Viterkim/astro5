@@ -51,6 +51,14 @@ return {
           desc = "Copy diagnostics",
         },
         ["<leader>ii"] = { function() require("snacks").picker.diagnostics() end, desc = "All diagnostics" },
+        ["<leader>im"] = {
+          function()
+            local rm = require "render-markdown"
+            rm.toggle()
+            vim.notify("RenderMarkdown: " .. (rm.get() and "ON" or "OFF"))
+          end,
+          desc = "Toggle RenderMarkdown",
+        },
         ["<leader>ir"] = { function() require("snacks").picker.lsp_references() end, desc = "Show References" },
         ["<leader>ff"] = { function() require("snacks").picker.files() end, desc = "Find Files" },
         ["<leader>fw"] = { function() require("snacks").picker.grep() end, desc = "Find Words" },
