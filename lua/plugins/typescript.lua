@@ -78,7 +78,6 @@ local conform_formatter = function(bufnr)
 end
 
 return {
-  { import = "astrocommunity.pack.json" },
   { import = "astrocommunity.lsp.nvim-lsp-file-operations" },
   {
     "nvim-treesitter/nvim-treesitter",

@@ -1,6 +1,5 @@
 vim.opt.winblend = 0
 
--- Remove unwanted format options globally
 vim.api.nvim_create_autocmd("BufWinEnter", {
   pattern = "*",
   desc = "Disable auto-comment formatting for this buffer",
