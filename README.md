@@ -9,4 +9,4 @@ git clone git@github.com:Viterkim/astro5.git ~/.config/nvim
 ```
 
 ## Personal other .dotfiles
-* Link to .dotfiles repo [Github Link](https://github.com/Viterkim/.dotfiles)
+- Link to dotfiles repo [Github Link](https://github.com/Viterkim/dotfiles)
