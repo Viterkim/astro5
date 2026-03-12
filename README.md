@@ -1,6 +1,8 @@
 # AstroNvim 5 Template - Viter
 
-A template for getting started with [AstroNvim](https://github.com/AstroNvim/AstroNvim)
+- [AstroNvim](https://github.com/AstroNvim/AstroNvim)
+- [AstroNvim Community](https://github.com/AstroNvim/astrocommunity)
+- [AstroNvim Docs / Default Mappings](https://docs.astronvim.com/mappings)
 
 ## 🛠️ Installation
 

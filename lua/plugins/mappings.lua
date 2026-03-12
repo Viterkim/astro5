@@ -1,10 +1,10 @@
 ---@type LazySpec
 return {
   "AstroNvim/astrocore",
-  -- ---@type AstroCoreOpts
   opts = {
     mappings = {
       n = {
+        -- Own
         ["j"] = {
           function()
             local key = vim.api.nvim_replace_termcodes("<C-o>", true, false, true)
@@ -39,6 +39,23 @@ return {
         ["grr"] = { function() require("snacks").picker.lsp_references() end, desc = "Show References" },
         ["gI"] = { function() vim.lsp.buf.implementation() end, desc = "LSP Implementation" },
         ["ø"] = { function() vim.lsp.buf.hover() end, desc = "Hover symbol details" },
+
+        -- leader F (search, literal, simple)
+        ["<leader>F"] = { desc = "Literal search" },
+        ["<leader>Ff"] = {
+          function() require("snacks").picker.files() end,
+          desc = "Find in file names",
+        },
+        ["<leader>Fw"] = {
+          function() require("snacks").picker.grep { regex = false } end,
+          desc = "Find words in files literally",
+        },
+        ["<leader>Fc"] = {
+          function() require("snacks").picker.grep_word { regex = false } end,
+          desc = "Find current word literally",
+        },
+
+        -- leader i
         ["<leader>if"] = { function() vim.lsp.buf.code_action() end, desc = "LSP Fixes" },
         ["<leader>id"] = { function() vim.diagnostic.open_float() end, desc = "Float diagnostics" },
         ["<leader>ic"] = {
@@ -79,14 +96,59 @@ return {
           end,
           desc = "Hover Enter",
         },
+
+        -- leader s (fixes)
+        ["<leader>s"] = { desc = "Fixes" },
+        ["<leader>sf"] = {
+          function() require("jfixes").rust_fill_match_arms_smart() end,
+          desc = "Rust fill match arms",
+        },
+        ["<leader>sn"] = {
+          function() require("funcs").rename_save_and_cleanup() end,
+          desc = "Rename, save all, close new buffers",
+        },
+        ["<leader>st"] = { "V$%", desc = "Select block to matching brace" },
+        ["<leader>sv"] = {
+          function() require("jfixes").select_whole_file() end,
+          desc = "Select whole file",
+        },
+        ["<leader>sw"] = {
+          function() require("funcs").strip_trailing_whitespace_all_buffers() end,
+          desc = "Strip trailing whitespace (all buffers)",
+        },
+        ["<leader>sW"] = {
+          function() require("funcs").strip_trailing_whitespace_current_buffer() end,
+          desc = "Strip trailing whitespace (current buffer)",
+        },
+
+        -- session
+        ["<leader>S"] = { desc = "Session" },
+        ["<leader>Sq"] = {
+          function() require("funcs").save_session_and_quit() end,
+          desc = "Save session and quit",
+        },
+
+        -- leader other
         ["<leader>ti"] = { function() require("neotest").output.open { enter = true } end, desc = "Neotest Output" },
         ["<leader>q"] = { "<cmd>q<CR>", desc = "Quit window" },
-        ["<leader>,a"] = { '<cmd>lua require("spectre").open()<CR>', desc = "Spectre" },
-        ["<leader>,w"] = { '<cmd>lua require("spectre").open_visual({select_word=true})<CR>', desc = "Spectre Word" },
-        ["<leader>,p"] = {
-          '<cmd>lua require("spectre").open_file_search({select_word=true})<CR>',
-          desc = "Spectre File",
+        ["<leader>0"] = {
+          function() require("funcs").sudoku_quit() end,
+          desc = "Nuke all windows",
         },
+
+        -- leader , spectre
+        ["<leader>,"] = { desc = "Spectre" },
+        ["<leader>,a"] = { '<cmd>lua require("spectre").open()<CR>', desc = "Spectre" },
+        ["<leader>,p"] = {
+          '<cmd>lua require("spectre").open_file_search()<CR>',
+          desc = "Spectre (current file)",
+        },
+        ["<leader>,w"] = {
+          '<cmd>lua require("spectre").open_visual({select_word=true})<CR>',
+          desc = "Spectre (current word)",
+        },
+
+        -- other
         ["__"] = { ":w<cr>", desc = "Save File" },
         ["<Backspace>"] = { "x", desc = "Delete char" },
         ["de"] = { "<S-v>ygvd", desc = "Cut Line" },
@@ -109,6 +171,7 @@ return {
         ["<C-b>"] = { "<esc>$a;<esc>", desc = "Insert ; at end" },
         ["<C-t>"] = { "<esc>", desc = "Escape" },
       },
+
       i = {
         ["<C-y>"] = {
           function()
@@ -126,7 +189,91 @@ return {
         ["__"] = { "<esc>:w<cr>", desc = "Save & Normal" },
         ["_("] = { "_", desc = "Literal underscore" },
       },
+
       v = {
+        -- visual leader f (regex)
+        ["<leader>f"] = { desc = "Find" },
+        ["<leader>fw"] = {
+          function()
+            local text = require("funcs").get_visual_selection()
+            if text == "" then return end
+            require("funcs").exit_visual()
+            vim.schedule(function() require("snacks").picker.grep { search = text } end)
+          end,
+          desc = "Find selected text (regex)",
+        },
+        ["<leader>ff"] = {
+          function()
+            local text = require("funcs").get_visual_one_line()
+            if text == "" then return end
+            require("funcs").exit_visual()
+            vim.schedule(
+              function()
+                require("snacks").picker.files {
+                  search = "*" .. text .. "*",
+                }
+              end
+            )
+          end,
+          desc = "Find file names from selection",
+        },
+
+        -- visual leader F (literal)
+        ["<leader>F"] = { desc = "Literal search" },
+        ["<leader>Fw"] = {
+          function()
+            local text = require("funcs").get_visual_selection()
+            if text == "" then return end
+            require("funcs").exit_visual()
+            vim.schedule(
+              function()
+                require("snacks").picker.grep {
+                  search = text,
+                  regex = false,
+                }
+              end
+            )
+          end,
+          desc = "Find selected text literally",
+        },
+        ["<leader>Ff"] = {
+          function()
+            local text = require("funcs").get_visual_one_line()
+            if text == "" then return end
+            require("funcs").exit_visual()
+            vim.schedule(
+              function()
+                require("snacks").picker.files {
+                  search = "*" .. text .. "*",
+                }
+              end
+            )
+          end,
+          desc = "Find file names from selection",
+        },
+
+        -- visual spectre
+        ["<leader>,"] = {
+          '<Esc><cmd>lua require("spectre").open_visual()<CR>',
+          desc = "Spectre (selection)",
+        },
+
+        -- visual fixes
+        ["<leader>s"] = { desc = "Fixes" },
+        ["<leader>sf"] = {
+          '<Esc><cmd>lua require("jfixes").rust_fill_match_arms_smart()<CR>',
+          desc = "Rust fill match arms",
+        },
+        ["<leader>st"] = {
+          "<Esc>V$%",
+          desc = "Select block to matching brace",
+        },
+        ["<leader>sv"] = {
+          '<Esc><cmd>lua require("jfixes").select_whole_file()<CR>',
+          desc = "Select whole file",
+        },
+
+        -- other
         ["r"] = { "<C-u>" },
         ["s"] = { "<C-d>" },
         ["j"] = { "<esc>", desc = "Normal Mode" },
