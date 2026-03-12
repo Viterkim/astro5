@@ -97,7 +97,7 @@ return {
           desc = "Hover Enter",
         },
 
-        -- leader s (fixes)
+        -- leader s (fixes / convenience)
         ["<leader>s"] = { desc = "Fixes" },
         ["<leader>sf"] = {
           function() require("jfixes").rust_fill_match_arms_smart() end,
@@ -108,7 +108,7 @@ return {
           desc = "Rename, save all, close new buffers",
         },
         ["<leader>st"] = { "V$%", desc = "Select block to matching brace" },
-        ["<leader>sv"] = {
+        ["<leader>ss"] = {
           function() require("jfixes").select_whole_file() end,
           desc = "Select whole file",
         },
