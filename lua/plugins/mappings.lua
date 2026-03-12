@@ -130,6 +130,8 @@ return {
         ["r"] = { "<C-u>" },
         ["s"] = { "<C-d>" },
         ["j"] = { "<esc>", desc = "Normal Mode" },
+        ["p"] = { '"_dP', desc = "Paste over without replacing clipboard" },
+        ["P"] = { '"_dP', desc = "Paste over without replacing clipboard" },
         ["<S-Up>"] = { "<cmd>m-2<cr>", desc = "Move line up" },
         ["<S-Down>"] = { "<cmd>m+<cr>", desc = "Move line down" },
         ["<C-y>"] = {
@@ -142,7 +144,7 @@ return {
         ["<C-t>"] = { "<esc>", desc = "Normal Mode" },
         ["<C-b>"] = { "<esc>$a;<esc>", desc = "Insert ;" },
         ["__"] = { "<esc>:w<cr>", desc = "Save & Normal" },
-        ["<Backspace>"] = { "x", desc = "Delete" },
+        ["<Backspace>"] = { '"_d', desc = "Delete" },
         ["o"] = { "ygvd", desc = "Cut" },
         ["c"] = { "ygv", desc = "Copy" },
       },
