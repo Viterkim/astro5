@@ -100,8 +100,12 @@ return {
         -- leader s (fixes / convenience)
         ["<leader>s"] = { desc = "Fixes" },
         ["<leader>sf"] = {
-          function() require("jfixes").rust_fill_match_arms_smart() end,
+          function() require("funcs").rust_fill_match_arms_smart() end,
           desc = "Rust fill match arms",
+        },
+        ["<leader>su"] = {
+          function() require("funcs").rust_remove_unused_imports_this_file() end,
+          desc = "Rust remove unused imports",
         },
         ["<leader>sn"] = {
           function() require("funcs").rename_save_and_cleanup() end,
@@ -109,7 +113,7 @@ return {
         },
         ["<leader>st"] = { "V$%", desc = "Select block to matching brace" },
         ["<leader>ss"] = {
-          function() require("jfixes").select_whole_file() end,
+          function() require("funcs").select_whole_file() end,
           desc = "Select whole file",
         },
         ["<leader>sw"] = {
@@ -261,16 +265,16 @@ return {
         -- visual fixes
         ["<leader>s"] = { desc = "Fixes" },
         ["<leader>sf"] = {
-          '<Esc><cmd>lua require("jfixes").rust_fill_match_arms_smart()<CR>',
+          '<Esc><cmd>lua require("funcs").rust_fill_match_arms_smart()<CR>',
           desc = "Rust fill match arms",
+        },
+        ["<leader>sv"] = {
+          '<Esc><cmd>lua require("funcs").select_whole_file()<CR>',
+          desc = "Select whole file",
         },
         ["<leader>st"] = {
           "<Esc>V$%",
           desc = "Select block to matching brace",
-        },
-        ["<leader>sv"] = {
-          '<Esc><cmd>lua require("jfixes").select_whole_file()<CR>',
-          desc = "Select whole file",
         },
 
         -- other

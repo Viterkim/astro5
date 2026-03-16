@@ -63,19 +63,13 @@ end
 
 function M.save_session_and_quit()
   local resession = require "resession"
-  local info = resession.get_current_session_info()
+  local cwd = vim.uv.cwd() or vim.fn.getcwd()
 
-  if info and info.name then
-    resession.save(info.name, {
-      dir = info.dir,
-      notify = false,
-    })
-  else
-    resession.save(vim.fn.getcwd(), {
-      dir = "dirsession",
-      notify = false,
-    })
-  end
+  resession.save(cwd, {
+    dir = "dirsession",
+    notify = false,
+    attach = false,
+  })
 
   vim.cmd "qa"
 end
@@ -185,5 +179,164 @@ function M.strip_trailing_whitespace_current_buffer()
   vim.cmd "silent update"
   vim.notify "Trailing whitespace removed"
 end
+
+local function looks_like_match_arms_action(action)
+  local title = (action.title or ""):lower()
+  return title:find("fill match arms", 1, true) ~= nil
+end
+
+local function ensure_match_line_has_braces()
+  local row = vim.api.nvim_win_get_cursor(0)[1]
+  local line = vim.api.nvim_get_current_line()
+
+  if not line:find "match%s+" then return nil end
+
+  if not line:find("{", 1, true) then
+    line = line:gsub("%s*$", "") .. " {}"
+    vim.api.nvim_set_current_line(line)
+  elseif not line:find("}", 1, true) then
+    line = line:gsub("%s*$", "") .. "}"
+    vim.api.nvim_set_current_line(line)
+  end
+
+  local open_brace = line:find("{", 1, true)
+  local close_brace = open_brace and line:find("}", open_brace + 1, true) or nil
+  if not open_brace or not close_brace then return nil end
+
+  local inner_col = open_brace
+  vim.api.nvim_win_set_cursor(0, { row, inner_col })
+
+  return { row = row }
+end
+
+local function replace_generated_todos_with_braces(open_pos)
+  if not open_pos then return end
+
+  local save = vim.api.nvim_win_get_cursor(0)
+
+  local line = vim.api.nvim_buf_get_lines(0, open_pos.row - 1, open_pos.row, false)[1]
+  if not line then return end
+
+  local open_brace = line:find("{", 1, true)
+  if not open_brace then return end
+
+  local brace_col = open_brace - 1
+  pcall(vim.api.nvim_win_set_cursor, 0, { open_pos.row, brace_col })
+
+  local ok = pcall(function() vim.cmd.normal { args = { "%" }, bang = true } end)
+
+  if not ok then
+    pcall(vim.api.nvim_win_set_cursor, 0, save)
+    return
+  end
+
+  local close = vim.api.nvim_win_get_cursor(0)
+  pcall(vim.api.nvim_win_set_cursor, 0, save)
+
+  local start_row = open_pos.row
+  local end_row = close[1]
+
+  if end_row < start_row then return end
+
+  local lines = vim.api.nvim_buf_get_lines(0, start_row - 1, end_row, false)
+  if #lines == 0 then return end
+
+  for i, l in ipairs(lines) do
+    lines[i] = l:gsub("(=>%s*)todo!%(%)(%s*,?)", "%1{}%2")
+  end
+
+  vim.api.nvim_buf_set_lines(0, start_row - 1, end_row, false, lines)
+end
+
+local function looks_like_organize_imports_action(action)
+  local title = (action.title or ""):lower()
+  local kind = action.kind or ""
+
+  return kind == "source.organizeImports"
+    or vim.startswith(kind, "source.organizeImports")
+    or title:find("remove unused imports", 1, true) ~= nil
+    or title:find("remove all unused imports", 1, true) ~= nil
+    or title:find("organize imports", 1, true) ~= nil
+end
+
+local function apply_first_matching_code_action(filter, context, timeout_ms)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_clients { bufnr = bufnr, method = "textDocument/codeAction" }
+
+  if #clients == 0 then
+    vim.notify("No LSP code actions available", vim.log.levels.WARN)
+    return false
+  end
+
+  for _, client in ipairs(clients) do
+    ---@type lsp.CodeActionParams
+    local params = {
+      textDocument = vim.lsp.util.make_text_document_params(bufnr),
+      range = vim.lsp.util.make_range_params(0, client.offset_encoding).range,
+      context = vim.tbl_deep_extend("force", {
+        diagnostics = vim.diagnostic.get(bufnr),
+      }, context or {}),
+    }
+
+    local resp = client:request_sync("textDocument/codeAction", params, timeout_ms or 3000, bufnr)
+    local actions = resp and resp.result or {}
+
+    for _, action in ipairs(actions) do
+      if filter(action, client) then
+        if action.edit then vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding) end
+
+        if type(action.command) == "table" then
+          client:exec_cmd(action.command, { bufnr = bufnr })
+        elseif type(action.command) == "string" then
+          client:exec_cmd({
+            title = action.title,
+            command = action.command,
+            arguments = action.arguments,
+          }, { bufnr = bufnr })
+        end
+
+        return true
+      end
+    end
+  end
+
+  return false
+end
+
+function M.rust_fill_match_arms_smart()
+  if vim.bo.filetype ~= "rust" then return end
+
+  vim.cmd.stopinsert()
+
+  local open_pos = ensure_match_line_has_braces()
+  if not open_pos then return end
+
+  local ok = apply_first_matching_code_action(looks_like_match_arms_action)
+  if not ok then
+    vim.notify("No fill match arms action found", vim.log.levels.INFO)
+    return
+  end
+
+  vim.defer_fn(function() replace_generated_todos_with_braces(open_pos) end, 120)
+end
+
+function M.rust_remove_unused_imports_this_file()
+  if vim.bo.filetype ~= "rust" then return end
+
+  vim.cmd.stopinsert()
+
+  local ok = apply_first_matching_code_action(looks_like_organize_imports_action, {
+    only = { "source.organizeImports" },
+    diagnostics = {},
+  })
+
+  if ok then
+    vim.cmd "silent update"
+  else
+    vim.notify("No remove-unused-imports action found", vim.log.levels.INFO)
+  end
+end
+
+function M.select_whole_file() vim.cmd.normal { args = { "gg0vG$" }, bang = true } end
 
 return M
