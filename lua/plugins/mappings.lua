@@ -56,6 +56,15 @@ return {
         },
 
         -- leader i
+        ["<leader>iæ"] = {
+          function()
+            local bufnr = 0
+            local enabled = vim.diagnostic.is_enabled { bufnr = bufnr }
+            vim.diagnostic.enable(not enabled, { bufnr = bufnr })
+            vim.notify("Diagnostics " .. (enabled and "OFF" or "ON") .. " for current buffer")
+          end,
+          desc = "Toggle Diagnostics",
+        },
         ["<leader>if"] = { function() vim.lsp.buf.code_action() end, desc = "LSP Fixes" },
         ["<leader>id"] = { function() vim.diagnostic.open_float() end, desc = "Float diagnostics" },
         ["<leader>ic"] = {
@@ -281,8 +290,16 @@ return {
         ["r"] = { "<C-u>" },
         ["s"] = { "<C-d>" },
         ["j"] = { "<esc>", desc = "Normal Mode" },
-        ["p"] = { '"_dP', desc = "Paste over without replacing clipboard" },
-        ["P"] = { '"_dP', desc = "Paste over without replacing clipboard" },
+        ["p"] = {
+          function() return require("funcs").visual_paste_keep_regs "p" end,
+          expr = true,
+          desc = "Paste over selection and keep clipboard",
+        },
+        ["P"] = {
+          function() return require("funcs").visual_paste_keep_regs "P" end,
+          expr = true,
+          desc = "Paste before selection and keep clipboard",
+        },
         ["<S-Up>"] = { "<cmd>m-2<cr>", desc = "Move line up" },
         ["<S-Down>"] = { "<cmd>m+<cr>", desc = "Move line down" },
         ["<C-y>"] = {

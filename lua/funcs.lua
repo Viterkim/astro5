@@ -339,4 +339,33 @@ end
 
 function M.select_whole_file() vim.cmd.normal { args = { "gg0vG$" }, bang = true } end
 
+local function visual_paste_restore_reg()
+  local reg = vim.v.register
+
+  if reg == nil or reg == "" or reg == '"' then
+    local cb = vim.opt.clipboard:get()
+    if vim.tbl_contains(cb, "unnamedplus") then
+      reg = "+"
+    elseif vim.tbl_contains(cb, "unnamed") then
+      reg = "*"
+    else
+      reg = '"'
+    end
+  end
+
+  return reg
+end
+
+function M.visual_paste_keep_regs(cmd)
+  local reg = visual_paste_restore_reg()
+  local saved = {
+    value = vim.fn.getreg(reg),
+    regtype = vim.fn.getregtype(reg),
+  }
+
+  vim.schedule(function() vim.fn.setreg(reg, saved.value, saved.regtype) end)
+
+  return cmd
+end
+
 return M
